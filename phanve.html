@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cấp cứu Phản vệ - Đầm Dơi</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; padding: 15px; color: #333; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h2 { color: #ce1126; text-align: center; margin-bottom: 5px; font-size: 1.4em; }
+        .dept { text-align: center; font-weight: bold; margin-bottom: 20px; font-size: 0.9em; color: #0056b3; }
+        .section-title { font-weight: bold; background: #eee; padding: 8px; border-radius: 5px; margin: 15px 0 10px 0; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        label { display: flex; align-items: center; font-size: 0.95em; cursor: pointer; background: #fafafa; padding: 8px; border-radius: 5px; border: 1px solid #ddd; }
+        input[type="checkbox"] { margin-right: 10px; transform: scale(1.2); }
+        input[type="number"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; background: #ce1126; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: bold; margin-top: 20px; }
+        #result { margin-top: 20px; display: none; padding: 20px; border-radius: 8px; line-height: 1.6; }
+        .emergency { background: #fff1f0; border: 2px solid #ff4d4f; }
+        .warning-text { color: #ce1126; font-weight: bold; text-transform: uppercase; text-align: center; display: block; font-size: 1.2em; margin-bottom: 10px; }
+        ul { padding-left: 20px; margin: 10px 0; }
+        li { margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>CHẨN ĐOÁN & XỬ TRÍ PHẢN VỆ</h2>
+    <div class="dept">KHOA NỘI TIM MẠCH - LÃO HỌC <br> BVĐK ĐẦM DƠI</div>
+
+    <div class="section-title">1. THÔNG TIN BỆNH NHÂN</div>
+    <div class="grid">
+        <div>
+            <label style="border:none; background:none;">Cân nặng (kg):</label>
+            <input type="number" id="weight" placeholder="Ví dụ: 60">
+        </div>
+        <div>
+            <label style="border:none; background:none;">Huyết áp tâm thu:</label>
+            <input type="number" id="sbp" placeholder="mmHg">
+        </div>
+    </div>
+
+    <div class="section-title">2. TRIỆU CHỨNG LÂM SÀNG (Click chọn)</div>
+    <div class="grid">
+        <label><input type="checkbox" class="dr" value="1">Mày đay, ngứa</label>
+        <label><input type="checkbox" class="dr" value="1">Phù mạch</label>
+        <label><input type="checkbox" class="hr" value="2">Khó thở, tức ngực</label>
+        <label><input type="checkbox" class="hr" value="2">Khàn tiếng</label>
+        <label><input type="checkbox" class="hr" value="3">Rít thanh quản</label>
+        <label><input type="checkbox" class="hr" value="3">Tím tái, khò khè</label>
+        <label><input type="checkbox" class="th" value="2">Đau bụng, nôn</label>
+        <label><input type="checkbox" class="tk" value="3">Vật vã, hôn mê</label>
+        <label><input type="checkbox" class="tk" value="3">Co giật</label>
+        <label><input type="checkbox" class="tn" value="3">Tụt huyết áp/Sốc</label>
+        <label><input type="checkbox" class="tn" value="4">Ngừng tuần hoàn</label>
+    </div>
+
+    <button onclick="diagnose()">XÁC ĐỊNH & XỬ TRÍ</button>
+
+    <div id="result"></div>
+</div>
+
+<script>
+function diagnose() {
+    const weight = parseFloat(document.getElementById('weight').value) || 0;
+    const sbp = parseFloat(document.getElementById('sbp').value) || 120;
+    const checks = document.querySelectorAll('input[type="checkbox"]:checked');
+    const resDiv = document.getElementById('result');
+    
+    let maxGrade = 0;
+    checks.forEach(c => {
+        let val = parseInt(c.value);
+        if (val > maxGrade) maxGrade = val;
+    });
+
+    // Logic bổ sung cho Độ II (có 2 biểu hiện ở nhiều cơ quan)
+    if (maxGrade < 2 && checks.length >= 2) maxGrade = 2;
+
+    resDiv.style.display = 'block';
+    resDiv.className = "emergency";
+
+    let html = "";
+    if (maxGrade === 1) {
+        html = `<span class="warning-text">Phản vệ Độ I (Nhẹ)</span>
+                <ul>
+                    <li>Sử dụng: Methylprednisolon hoặc Diphenhydramin (uống/tiêm).</li>
+                    <li>Theo dõi liên tục ít nhất 24 giờ.</li>
+                </ul>`;
+    } else if (maxGrade >= 2) {
+        let dose = "0.5 - 1 ống";
+        if (weight > 0) {
+            if (weight < 10) dose = "0.2 ml (1/5 ống)";
+            else if (weight < 20) dose = "0.25 ml (1/4 ống)";
+            else if (weight < 30) dose = "0.3 ml (1/3 ống)";
+            else dose = "0.5 ml (1/2 ống)";
+        }
+
+        let gradeText = maxGrade === 2 ? "Độ II (Nặng)" : (maxGrade === 3 ? "Độ III (Nguy kịch)" : "Độ IV (Ngừng tuần hoàn)");
+        
+        html = `<span class="warning-text">${gradeText}</span>
+                <div style="background:#ce1126; color:white; padding:10px; border-radius:5px; font-weight:bold; text-align:center; margin-bottom:10px;">
+                    TIÊM BẮP NGAY ADRENALIN: ${dose}
+                </div>
+                <strong>Các bước xử trí tiếp theo:</strong>
+                <ul>
+                    <li>Ngừng ngay tiếp xúc với dị nguyên.</li>
+                    <li>Nằm tại chỗ, đầu thấp, nghiêng trái nếu nôn.</li>
+                    <li>Thở Oxy: Người lớn 6-10L/p, Trẻ em 2-4L/p.</li>
+                    <li>Nhắc lại Adrenalin sau mỗi 3-5 phút nếu HA chưa ổn định.</li>
+                    <li>Thiết lập đường truyền tĩnh mạch Adrenalin nếu không đáp ứng.</li>
+                    <li>Truyền dịch Natri clorid 0,9%: 1-2 lít (người lớn).</li>
+                    <li>Theo dõi Mạch, HA, SpO2 mỗi 3-5 phút/lần.</li>
+                </ul>`;
+    } else {
+        html = `<div style="text-align:center;">Vui lòng chọn triệu chứng để chẩn đoán.</div>`;
+    }
+    
+    resDiv.innerHTML = html;
+    window.scrollTo(0, document.body.scrollHeight);
+}
+</script>
+
+</body>
+</html>
